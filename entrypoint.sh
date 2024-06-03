@@ -17,27 +17,31 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}➜ %s${reset}\n" "$@"
 }
 
+## variables for this script
 TOR_CONFIG_FILE=${DATA_DIR}/torrc
 BRIDGE_FILE=${DATA_DIR}/torrc_bridges
 LOCK_FILE=${DATA_DIR}/.lock
 
-## default values
+## tor config default values
 SOCKS_IP=${SOCKS_IP:=127.0.0.1}
 SOCKS_PORT=${SOCKS_PORT:=9050}
 SOCKS_ACCEPT=${SOCKS_ACCEPT:=}
 SOCKS_REJECT=${SOCKS_REJECT:=}
 EXIT_RELAY=${EXIT_RELAY:=0}
-## set tor relay scanner variables
+## set tor relay scanner values
 NUM_RELAYS=${NUM_RELAYS:=100}
 MIN_RELAYS=${MIN_RELAYS:=1}
 RELAY_TIMEOUT=${RELAY_TIMEOUT:=3}
+## Format: http://user:pass@host:port; socks5h://user:pass@host:port'
+PROXY_FOR_SCANNER=${PROXY_FOR_SCANNER:=}
 
+## remove tor config file if exist
 if [[ -f "${TOR_CONFIG_FILE}" ]]; then  
     warn "removing old config"
     rm -f "${TOR_CONFIG_FILE}"
 fi
 
-
+## remove file with list of bridges if exist
 if [[ -f "${BRIDGE_FILE}" ]]; then
     warn "removing old bridge config"
     rm -f "${BRIDGE_FILE}"
@@ -73,8 +77,10 @@ map_user(){
 }
 
 tor_config () {
+    ## set SocksPort value to conf file
     warn "SocksPort value ${SOCKS_IP}:${SOCKS_PORT} saved to ${TOR_CONFIG_FILE}"
     echo "SocksPort $SOCKS_IP:$SOCKS_PORT" >> "${TOR_CONFIG_FILE}"
+    ## if socks policy not null - set sockspolicy
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
         warn "SocksPolicy accept ${SOCKS_ACCEPT} saved to ${TOR_CONFIG_FILE}"
         echo "SocksPolicy accept ${SOCKS_ACCEPT}" >> "${TOR_CONFIG_FILE}"
@@ -83,14 +89,31 @@ tor_config () {
         warn "SocksPolicy reject ${SOCKS_REJECT} saved to ${TOR_CONFIG_FILE}"
         echo "SocksPolicy reject ${SOCKS_REJECT}" >> "${TOR_CONFIG_FILE}"
     fi
+    ## set exit relay value
     warn "set exit relay to $EXIT_RELAY"
     echo "ExitRelay $EXIT_RELAY" >> "${TOR_CONFIG_FILE}"
 #    echo "UseBridges 1" >> "${TOR_CONFIG_FILE}"
     echo "%include $BRIDGE_FILE" >> "${TOR_CONFIG_FILE}"
+
     warn "min relays to find set to $MIN_RELAYS"
     warn "number of parallel connections to bridges to check availability set to $NUM_RELAYS"
     warn "timeout relay check set to $RELAY_TIMEOUT"
 
+}
+
+relay_scan () {
+         ## creating lock file to temporary disable healthcheck
+    touch "${LOCK_FILE}"
+
+    ## searching open port from bridge list with tor-relay-scanner by valdikSS
+    ## and write founded list to file
+    while [ ! -s "$BRIDGE_FILE" ]; do
+        tor-relay-scanner --torrc \
+                          -n "${NUM_RELAYS}" \
+                          -g "${MIN_RELAYS}" \
+                          --timeout "${RELAY_TIMEOUT}" ${PROXY_FOR_SCANNER} > "${BRIDGE_FILE}"
+    done
+    rm -f "${LOCK_FILE}"
 }
 
 main () {
@@ -102,26 +125,14 @@ main () {
     map_user
 
     echo -e ""
-    success "====================================- STARTING TOR WITH RELAYS BUNDLE -===================================="
+    success "=========================- STARTING TOR WITH RELAYS BUNDLE -============================="
     echo -e ""
- 
-     ## creating lock file to temporary disable healthcheck
-    touch "${LOCK_FILE}"
-
-    ## searching open port from bridge list with tor-relay-scanner by valdikSS
-    ## and write founded list to file
-    while [ ! -s "$BRIDGE_FILE" ]; do
-        tor-relay-scanner --torrc \
-                          -n "${NUM_RELAYS}" \
-                          -g "${MIN_RELAYS}" \
-                          --timeout "${RELAY_TIMEOUT}" > "${BRIDGE_FILE}"
-    done
- 
+    
+    relay_scan
     success "number of relays scanner found: $(( $(wc -l < ${BRIDGE_FILE}) - 1 ))"
 
      ## Display Tor version & torrc in log
     tor --version
-    rm -f "${LOCK_FILE}"
     ## Execute dockerfile CMD as nonroot alternate gosu                                                                                                                           "
     su-exec "${PUID}:${PGID}" "$@"
 }

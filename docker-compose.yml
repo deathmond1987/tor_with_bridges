@@ -11,3 +11,5 @@ services:
       - "NUM_RELAYS=100"
       - "MIN_RELAYS=2"
       - "RELAY_TIMEOUT=3"
+## set proxy for download list of bridges. Format: http://user:pass@host:port; socks5h://user:pass@host:port'
+      - "PROXY_FOR_SCANNER=" 
