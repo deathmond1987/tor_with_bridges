@@ -76,9 +76,10 @@ RUN addgroup --gid 1001 --system nonroot && \
 RUN apk --no-cache add \
     bash \
     curl \
-#    libevent \
+    libevent \
     tini su-exec \
-    openssl 
+    openssl \
+    tzdata
 #shadow coreutils tzdata
 ## data directory
 ENV DATA_DIR=/tor
