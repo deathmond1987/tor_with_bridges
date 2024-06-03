@@ -3,6 +3,7 @@ services:
     image: new_tor:latest
     container_name: tor_with_bridges
     hostname: tor_with_bridges
+    restart: always
     environment:
       - "SOCKS_IP=0.0.0.0"
       - "SOCKS_PORT=9050"
