@@ -1,6 +1,6 @@
 services:
   tor_with_bridges:
-    image: new_tor:latest
+    image: tor_with_bridges:latest
     container_name: tor_with_bridges
     hostname: tor_with_bridges
     restart: always
