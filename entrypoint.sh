@@ -8,13 +8,13 @@ green="\033[0;32m"
 white="\033[0;37m"
 tan="\033[0;33m"
 
-info() { printf "${white}➜ %s${reset}\n" "$@"
+info() { printf "${white}%s${reset}\n" "$@"
 }
-success() { printf "${green}✔ %s${reset}\n" "$@"
+success() { printf "${green}%s${reset}\n" "$@"
 }
 error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 }
-warn() { printf "${tan}➜ %s${reset}\n" "$@"
+warn() { printf "${tan}%s${reset}\n" "$@"
 }
 
 ## variables for this script
@@ -91,7 +91,6 @@ tor_config () {
     fi
  
     ## set exit relay value
-    warn "set exit relay to $EXIT_RELAY"
     echo "ExitRelay $EXIT_RELAY" >> "${TOR_CONFIG_FILE}"
     echo "%include $BRIDGE_FILE" >> "${TOR_CONFIG_FILE}"
 
@@ -104,29 +103,31 @@ tor_config () {
 }
 
 print_config () {
-    warn "SocksPort value ${SOCKS_IP}:${SOCKS_PORT} saved to ${TOR_CONFIG_FILE}"
+    warn "--------------------------------------------------------------------"
+    warn "tor config:"
+    info "  SocksPort value set to ${SOCKS_IP}:${SOCKS_PORT}"
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
-        warn "SocksPolicy accept ${SOCKS_ACCEPT} saved to ${TOR_CONFIG_FILE}"
+        info "  SocksPolicy accept set to ${SOCKS_ACCEPT}"
     fi
+    info "  set exit relay to $EXIT_RELAY"
     if [[ ! -z "${SOCKS_REJECT}" ]]; then
-        warn "SocksPolicy reject ${SOCKS_REJECT} saved to ${TOR_CONFIG_FILE}"
+        info "  SocksPolicy reject set to ${SOCKS_REJECT}"
     fi    
-    warn "set exit relay to $EXIT_RELAY"
-    warn "min relays to find set to $MIN_RELAYS"
-    warn "number of parallel connections to bridges to check availability set to $NUM_RELAYS"
-    warn "timeout relay check set to $RELAY_TIMEOUT"
+
     if [[ ! -z "${HTTPS_PROXY}" ]]; then
-        warn "set HTTPSProxy to ${HTTPS_PROXY}"
+        info "  set HTTPSProxy to ${HTTPS_PROXY}"
     fi
     if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
-        warn "set HTTPSProxyAuthenticator to $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
+        info "  set HTTPSProxyAuthenticator to $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
     fi
-    warn "set exit relay to $EXIT_RELAY"
-    warn "min relays to find set to $MIN_RELAYS"
-    warn "number of parallel connections to bridges to check availability set to $NUM_RELAYS"
+    warn "scanner config:"
+    info "  min relays to find set to $MIN_RELAYS"
+    info "  timeout relay check set to $RELAY_TIMEOUT"
+    info "  number of parallel connections to bridges to check availability set to $NUM_RELAYS"
     if [[ ! -z "${PROXY_FOR_SCANNER}" ]]; then
-        warn "set scanner proxy to ${PROXY_FOR_SCANNER}"
+        info "  set scanner proxy to ${PROXY_FOR_SCANNER}"
     fi
+    warn "--------------------------------------------------------------------"
 }
 
 relay_scan () {
@@ -154,7 +155,7 @@ main () {
     map_user
 
     echo -e ""
-    success "=========================- STARTING TOR WITH RELAYS BUNDLE -============================="
+    success "==========================- STARTING TOR WITH RELAYS BUNDLE -==============================="
     echo -e ""
     
     relay_scan
