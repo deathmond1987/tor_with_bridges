@@ -17,3 +17,4 @@ services:
       - "HTTPS_PROXY_CREDS="
       - "SOCKS_ACCEPT="
       - "SOCKS_REJECT="
+      - "PROXY_FOR_SCANNER"

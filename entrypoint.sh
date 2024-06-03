@@ -37,6 +37,13 @@ RELAY_TIMEOUT=${RELAY_TIMEOUT:=3}
 ## Format: http://user:pass@host:port; socks5h://user:pass@host:port'
 PROXY_FOR_SCANNER=${PROXY_FOR_SCANNER:=}
 
+if [[ -z "${PROXY_FOR_SCANNER}" ]]; then
+    proxy_command="--proxy $PROXY_FOR_SCANNER"
+else
+    proxy_command=""
+fi
+
+
 ## remove tor config file if exist
 if [[ -f "${TOR_CONFIG_FILE}" ]]; then  
     warn "removing old config"
@@ -146,7 +153,7 @@ relay_scan () {
         tor-relay-scanner --torrc \
                           -n "${NUM_RELAYS}" \
                           -g "${MIN_RELAYS}" \
-                          --timeout "${RELAY_TIMEOUT}" ${PROXY_FOR_SCANNER} > "${BRIDGE_FILE}"
+                          --timeout "${RELAY_TIMEOUT}" $proxy_command > "${BRIDGE_FILE}"
     done
     rm -f "${LOCK_FILE}"
 }
