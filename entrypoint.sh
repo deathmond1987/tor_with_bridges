@@ -52,6 +52,7 @@ fi
 ## remove cached entry guards
 if [[ -f /home/nonroot/.tor/state ]]; then
     rm -f /home/nonroot/.tor/state
+    warn "tor state file removed"
 fi
 
 map_user(){
