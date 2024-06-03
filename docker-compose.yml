@@ -1,0 +1,12 @@
+services:
+  tor_with_bridges:
+    image: new_tor:latest
+    container_name: tor_with_bridges
+    hostname: tor_with_bridges
+    environment:
+      - "SOCKS_IP=0.0.0.0"
+      - "SOCKS_PORT=9050"
+      - "EXIT_RELAY=0"
+      - "NUM_RELAYS=100"
+      - "MIN_RELAYS=1"
+      - "RELAY_TIMEOUT=3"
