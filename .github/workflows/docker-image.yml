@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  arti_build:
+  tor_build_container:
 
     runs-on: ubuntu-latest
 
