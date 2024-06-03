@@ -28,6 +28,8 @@ SOCKS_PORT=${SOCKS_PORT:=9050}
 SOCKS_ACCEPT=${SOCKS_ACCEPT:=}
 SOCKS_REJECT=${SOCKS_REJECT:=}
 EXIT_RELAY=${EXIT_RELAY:=0}
+HTTPS_PROXY=${HTTPS_PROXY:=}
+HTTPS_PROXY_CREDS=${HTTPS_PROXY_CREDS:=}
 ## set tor relay scanner values
 NUM_RELAYS=${NUM_RELAYS:=100}
 MIN_RELAYS=${MIN_RELAYS:=1}
@@ -78,27 +80,53 @@ map_user(){
 
 tor_config () {
     ## set SocksPort value to conf file
-    warn "SocksPort value ${SOCKS_IP}:${SOCKS_PORT} saved to ${TOR_CONFIG_FILE}"
     echo "SocksPort $SOCKS_IP:$SOCKS_PORT" >> "${TOR_CONFIG_FILE}"
+ 
     ## if socks policy not null - set sockspolicy
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
-        warn "SocksPolicy accept ${SOCKS_ACCEPT} saved to ${TOR_CONFIG_FILE}"
         echo "SocksPolicy accept ${SOCKS_ACCEPT}" >> "${TOR_CONFIG_FILE}"
     fi
     if [[ ! -z "${SOCKS_REJECT}" ]]; then
-        warn "SocksPolicy reject ${SOCKS_REJECT} saved to ${TOR_CONFIG_FILE}"
         echo "SocksPolicy reject ${SOCKS_REJECT}" >> "${TOR_CONFIG_FILE}"
     fi
+ 
     ## set exit relay value
     warn "set exit relay to $EXIT_RELAY"
     echo "ExitRelay $EXIT_RELAY" >> "${TOR_CONFIG_FILE}"
-#    echo "UseBridges 1" >> "${TOR_CONFIG_FILE}"
     echo "%include $BRIDGE_FILE" >> "${TOR_CONFIG_FILE}"
 
+    if [[ ! -z "${HTTPS_PROXY}" ]]; then
+        echo  "HTTPSProxy ${HTTPS_PROXY}" >> "${TOR_CONFIG_FILE}"
+    fi
+    if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
+        echo "HTTPSProxyAuthenticator ${HTTPS_PROXY_CREDS}" >> "${TOR_CONFIG_FILE}"
+    fi
+}
+
+print_config () {
+    warn "SocksPort value ${SOCKS_IP}:${SOCKS_PORT} saved to ${TOR_CONFIG_FILE}"
+    if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
+        warn "SocksPolicy accept ${SOCKS_ACCEPT} saved to ${TOR_CONFIG_FILE}"
+    fi
+    if [[ ! -z "${SOCKS_REJECT}" ]]; then
+        warn "SocksPolicy reject ${SOCKS_REJECT} saved to ${TOR_CONFIG_FILE}"
+    fi    
+    warn "set exit relay to $EXIT_RELAY"
     warn "min relays to find set to $MIN_RELAYS"
     warn "number of parallel connections to bridges to check availability set to $NUM_RELAYS"
     warn "timeout relay check set to $RELAY_TIMEOUT"
-
+    if [[ ! -z "${HTTPS_PROXY}" ]]; then
+        warn "set HTTPSProxy to ${HTTPS_PROXY}"
+    fi
+    if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
+        warn "set HTTPSProxyAuthenticator to $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
+    fi
+    warn "set exit relay to $EXIT_RELAY"
+    warn "min relays to find set to $MIN_RELAYS"
+    warn "number of parallel connections to bridges to check availability set to $NUM_RELAYS"
+    if [[ ! -z "${PROXY_FOR_SCANNER}" ]]; then
+        warn "set scanner proxy to ${PROXY_FOR_SCANNER}"
+    fi
 }
 
 relay_scan () {
@@ -122,6 +150,7 @@ main () {
     echo -e ""
 
     tor_config
+    print_config
     map_user
 
     echo -e ""
