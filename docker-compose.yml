@@ -8,5 +8,5 @@ services:
       - "SOCKS_PORT=9050"
       - "EXIT_RELAY=0"
       - "NUM_RELAYS=100"
-      - "MIN_RELAYS=1"
+      - "MIN_RELAYS=2"
       - "RELAY_TIMEOUT=3"
