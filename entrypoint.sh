@@ -17,6 +17,12 @@ error() { >&2 printf "${red}✖ %s${reset}\n" "$@"
 warn() { printf "${tan}%s${reset}\n" "$@"
 }
 
+echo '    __                                __           __                    ____    '
+echo '   / /_____  _____   _________  _____/ /_______   / /_  __  ______  ____/ / /__  '
+echo '  / __/ __ \/ ___/  / ___/ __ \/ ___/ //_/ ___/  / __ \/ / / / __ \/ __  / / _ \ '
+echo ' / /_/ /_/ / /     (__  ) /_/ / /__/ ,< (__  )  / /_/ / /_/ / / / / /_/ / /  __/ '
+echo ' \__/\____/_/     /____/\____/\___/_/|_/____/  /_.___/\__,_/_/ /_/\__,_/_/\___/  '
+
 ## variables for this script
 TOR_CONFIG_FILE=${DATA_DIR}/torrc
 BRIDGE_FILE=${DATA_DIR}/torrc_bridges
@@ -37,7 +43,7 @@ RELAY_TIMEOUT=${RELAY_TIMEOUT:=3}
 ## Format: http://user:pass@host:port; socks5h://user:pass@host:port'
 PROXY_FOR_SCANNER=${PROXY_FOR_SCANNER:=}
 
-if [[ -z "${PROXY_FOR_SCANNER}" ]]; then
+if [[ ! -z "${PROXY_FOR_SCANNER}" ]]; then
     proxy_command="--proxy $PROXY_FOR_SCANNER"
 else
     proxy_command=""
@@ -56,11 +62,12 @@ if [[ -f "${BRIDGE_FILE}" ]]; then
     rm -f "${BRIDGE_FILE}"
 fi
 
-## remove cached entry guards
-if [[ -f /home/nonroot/.tor/state ]]; then
-    rm -f /home/nonroot/.tor/state
-    warn "tor state file removed"
-fi
+### remove cached entry guards
+### or not...
+#if [[ -f /home/nonroot/.tor/state ]]; then
+#    rm -f /home/nonroot/.tor/state
+#    warn "tor state file removed"
+#fi
 
 map_user(){
     ## https://github.com/magenta-aps/docker_user_mapping/blob/master/user-mapping.sh
@@ -159,10 +166,6 @@ relay_scan () {
 }
 
 main () {
-    echo -e ""
-    warn "====================================- INITIALISING TOR -===================================="
-    echo -e ""
-
     tor_config
     print_config
     map_user
