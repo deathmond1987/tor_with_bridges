@@ -49,6 +49,11 @@ if [[ -f "${BRIDGE_FILE}" ]]; then
     rm -f "${BRIDGE_FILE}"
 fi
 
+## remove cached entry guards
+if [[ -f /home/nonroot/.tor/state ]]; then
+    rm -f /home/nonroot/.tor/state
+fi
+
 map_user(){
     ## https://github.com/magenta-aps/docker_user_mapping/blob/master/user-mapping.sh
     ## https://github.com/linuxserver/docker-baseimage-alpine/blob/3eb7146a55b7bff547905e0d3f71a26036448ae6/root/etc/cont-init.d/10-adduser
