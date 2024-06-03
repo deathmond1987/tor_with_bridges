@@ -73,12 +73,13 @@ RUN addgroup --gid 1001 --system nonroot && \
 ## Install Alpine packages
 ## bind-tools is needed for DNS resolution to work in *some* Docker networks
 ## Tini allows us to avoid several Docker edge cases, see https://github.com/krallin/tini.
-RUN apk --no-cache add --update \
+RUN apk --no-cache add \
     bash \
     curl \
-    libevent \
+#    libevent \
     tini su-exec \
-    openssl shadow coreutils tzdata
+    openssl 
+#shadow coreutils tzdata
 ## data directory
 ENV DATA_DIR=/tor
 
