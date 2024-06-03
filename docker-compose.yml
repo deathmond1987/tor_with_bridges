@@ -9,7 +9,7 @@ services:
       - "SOCKS_PORT=9050"
       - "EXIT_RELAY=0"
       - "NUM_RELAYS=100"
-      - "MIN_RELAYS=2"
+      - "MIN_RELAYS=3"
       - "RELAY_TIMEOUT=3"
 ## set proxy for download list of bridges. Format: http://user:pass@host:port; socks5h://user:pass@host:port'
       - "PROXY_FOR_SCANNER="
