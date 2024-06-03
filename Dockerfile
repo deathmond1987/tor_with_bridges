@@ -1,6 +1,6 @@
 ## Pinned version tag from https://hub.docker.com/_/alpine
 ARG ALPINE_VER=latest
-ARG TOR_VER=0.4.8.11
+ENV TOR_VER=0.4.8.11
 ########################################################################################
 ## STAGE ZERO - BUILD TOR RELAY SCANNER
 ########################################################################################
