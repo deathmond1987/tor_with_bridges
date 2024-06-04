@@ -1,28 +1,11 @@
 services:
   tor_with_bridges:
     image: deathmond1987/tor_with_bridges:latest
-    container_name: tor_with_bridges
-    hostname: tor_with_bridges
+    container_name: tor
+    hostname: tor
     restart: always
-    environment:
-      - "SOCKS_IP=0.0.0.0"
-      - "SOCKS_PORT=9050"
-      - "EXIT_RELAY=0"
-      - "NUM_RELAYS=100"
-      - "MIN_RELAYS=3"
-      - "RELAY_TIMEOUT=3"
-      - "HTTPS_PROXY="
-      - "HTTPS_PROXY_CREDS="
-      - "SOCKS_ACCEPT="
-      - "SOCKS_REJECT="
-      - "PROXY_FOR_SCANNER"
-      - "TZ=Europe/Moscow"
-      - "EXCLUDE_EXIT_NODES={ru}, {en}"
-      - "TOR_CONTROL_PORT=9051"
-#      - "PASSWORD=TESTTESTTEST"
-#      - "DEBUG=true"
-      - "TOR_CONTROL_PORT=9051"
-      - "HTTP_TUNNEL_PORT="
     ports:
-      - "9050:9050"
-      - "9051:9051"
+      - "9050:${SOCKS_PORT}"
+      - "9051:${TOR_CONTROL_PORT}"
+    env_file:
+      - .env
