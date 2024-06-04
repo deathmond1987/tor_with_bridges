@@ -216,9 +216,9 @@ relay_scan () {
 
 print_debug () {
     if [ ! -z "${DEBUG}" ]; then
-        warn "    ${TOR_CONFIG_FILE}:"
+        warn "--- ${TOR_CONFIG_FILE}:"
         cat "${TOR_CONFIG_FILE}"
-        warn "    ${BRIDGE_FILE}:"
+        warn "--- ${BRIDGE_FILE}:"
         cat "${BRIDGE_FILE}"
     fi
 }
