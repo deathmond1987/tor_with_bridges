@@ -112,7 +112,7 @@ tor_config () {
     fi
  
     if [[ ! -z "${TOR_CONTROL_PORT}" ]]; then
-        echo "ControlPort ${TOR_CONTROL_PORT}" >> "${TOR_CONFIG_FILE}"
+        echo "ControlPort 0.0.0.0:${TOR_CONTROL_PORT}" >> "${TOR_CONFIG_FILE}"
         PASS_GEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32; echo)
         PASSWORD=${PASSWORD:=$PASS_GEN}
         HASH_PASS=$(tor --hash-password $PASSWORD | tail -n1)
@@ -162,6 +162,7 @@ print_config () {
     info "  timeout relay check set: ${RELAY_TIMEOUT}"
     info "  check simultaneously bridges availability set: ${NUM_RELAYS}"
     warn "------------------------------------------------------------------------------"
+    info "config examples: https://wiki.archlinux.org/title/tor"
 }
 
 relay_scan () {

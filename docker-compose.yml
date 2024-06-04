@@ -18,4 +18,10 @@ services:
       - "PROXY_FOR_SCANNER"
       - "TZ=Europe/Moscow"
       - "EXCLUDE_EXIT_NODES={ru}, {en}"
+      - "TOR_CONTROL_PORT=9051"
+#      - "PASSWORD=TESTTESTTEST"
 #      - "DEBUG=true"
+      - "TOR_CONTROL_PORT=9051"
+    ports:
+      - "9050:9050"
+      - "9051:9051"
