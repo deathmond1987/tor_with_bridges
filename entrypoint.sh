@@ -189,8 +189,11 @@ print_config () {
     info "  timeout relay check set: ${RELAY_TIMEOUT}"
     info "  check simultaneously bridges availability set: ${NUM_RELAYS}"
     warn "------------------------------------------------------------------------------"
-    info "config examples: https://wiki.archlinux.org/title/tor"
-    info "tor manual: https://2019.www.torproject.org/docs/tor-manual.html.en"
+    echo ""
+    info "config examples: https://wiki.archlinux.org/title/tor
+    "
+    info "tor manual: https://2019.www.torproject.org/docs/tor-manual.html.en
+    "
 }
 
 relay_scan () {
