@@ -40,15 +40,6 @@ HTTPS_PROXY_CREDS=${HTTPS_PROXY_CREDS:=}
 NUM_RELAYS=${NUM_RELAYS:=100}
 MIN_RELAYS=${MIN_RELAYS:=1}
 RELAY_TIMEOUT=${RELAY_TIMEOUT:=3}
-## Format: http://user:pass@host:port; socks5h://user:pass@host:port'
-PROXY_FOR_SCANNER=${PROXY_FOR_SCANNER:=}
-
-if [[ ! -z "${PROXY_FOR_SCANNER}" ]]; then
-    proxy_command="--proxy $PROXY_FOR_SCANNER"
-else
-    proxy_command=""
-fi
-
 
 ## remove tor config file if exist
 if [[ -f "${TOR_CONFIG_FILE}" ]]; then  
@@ -85,12 +76,12 @@ map_user(){
 
     ## Make sure volumes directories match nonroot
     chown -R nonroot:nonroot \
-        ${DATA_DIR}
+        "${DATA_DIR}"
     warn "Enforced ownership of ${DATA_DIR} to nonroot:nonroot"
 
     ## Make sure volume permissions are correct
     chmod -R go=rX,u=rwX \
-        ${DATA_DIR}
+        "${DATA_DIR}"
     warn "Enforced permissions for ${DATA_DIR} to go=rX & u=rwX"
 
     ## Export to the rest of the bash script
@@ -123,9 +114,11 @@ tor_config () {
 }
 
 print_config () {
+    ## print info about config sets
+    info "CONFIG:"
     warn "--------------------------------------------------------------------"
     warn "tor config:"
-    info "  SocksPort value set to ${SOCKS_IP}:${SOCKS_PORT}"
+    info "  SocksPort listen on ${SOCKS_IP}:${SOCKS_PORT}"
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
         info "  SocksPolicy accept set to ${SOCKS_ACCEPT}"
     fi
@@ -135,48 +128,44 @@ print_config () {
     fi    
 
     if [[ ! -z "${HTTPS_PROXY}" ]]; then
-        info "  set HTTPSProxy to ${HTTPS_PROXY}"
+        info "  HTTPSProxy set to ${HTTPS_PROXY}"
     fi
     if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
-        info "  set HTTPSProxyAuthenticator to $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
+        info "  HTTPSProxyAuthenticator set to $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
     fi
     warn "scanner config:"
-    info "  min relays to find set to $MIN_RELAYS"
-    info "  timeout relay check set to $RELAY_TIMEOUT"
-    info "  number of parallel connections to bridges to check availability set to $NUM_RELAYS"
+    info "  min relays to find set to ${MIN_RELAYS}"
+    info "  timeout relay check set to ${RELAY_TIMEOUT}"
+    info "  check simultaneously bridges availability set to ${NUM_RELAYS}"
     if [[ ! -z "${PROXY_FOR_SCANNER}" ]]; then
-        info "  set scanner proxy to ${PROXY_FOR_SCANNER}"
+        info "  scanner proxy set to ${PROXY_FOR_SCANNER}"
     fi
     warn "--------------------------------------------------------------------"
 }
 
 relay_scan () {
-         ## creating lock file to temporary disable healthcheck
+    ## creating lock file to temporary disable healthcheck
     touch "${LOCK_FILE}"
 
     ## searching open port from bridge list with tor-relay-scanner by valdikSS
     ## and write founded list to file
-    while [ ! -s "$BRIDGE_FILE" ]; do
+    while [ ! -s "${BRIDGE_FILE}" ]; do
         tor-relay-scanner --torrc \
                           -n "${NUM_RELAYS}" \
                           -g "${MIN_RELAYS}" \
-                          --timeout "${RELAY_TIMEOUT}" $proxy_command > "${BRIDGE_FILE}"
+                          --timeout "${RELAY_TIMEOUT}" > "${BRIDGE_FILE}"
     done
+    ## remove lock file
     rm -f "${LOCK_FILE}"
+    ## print min relays founded info
+    success "number of relays scanner found: $(( $(wc -l < ${BRIDGE_FILE}) - 1 ))"
 }
 
 main () {
     tor_config
     print_config
     map_user
-
-    echo -e ""
-    success "==========================- STARTING TOR WITH RELAYS BUNDLE -==============================="
-    echo -e ""
-    
     relay_scan
-    success "number of relays scanner found: $(( $(wc -l < ${BRIDGE_FILE}) - 1 ))"
-
      ## Display Tor version & torrc in log
     tor --version
     ## Execute dockerfile CMD as nonroot alternate gosu                                                                                                                           "
