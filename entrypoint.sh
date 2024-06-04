@@ -44,6 +44,7 @@ SOCKS_REJECT=${SOCKS_REJECT:=}
 EXIT_RELAY=${EXIT_RELAY:=0}
 HTTPS_PROXY=${HTTPS_PROXY:=}
 HTTPS_PROXY_CREDS=${HTTPS_PROXY_CREDS:=}
+TOR_CONTROL_PORT=${TOR_CONTROL_PORT:=}
 ## set tor relay scanner values
 NUM_RELAYS=${NUM_RELAYS:=100}
 MIN_RELAYS=${MIN_RELAYS:=1}
@@ -110,6 +111,14 @@ tor_config () {
         echo "SocksPolicy reject ${SOCKS_REJECT}" >> "${TOR_CONFIG_FILE}"
     fi
  
+    if [[ ! -z "${TOR_CONTROL_PORT}" ]]; then
+        echo "ControlPort ${TOR_CONTROL_PORT}" >> "${TOR_CONFIG_FILE}"
+        PASS_GEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32; echo)
+        PASSWORD=${PASSWORD:=$PASS_GEN}
+        HASH_PASS=$(tor --hash-password $PASSWORD | tail -n1)
+        echo "HashedControlPassword ${HASH_PASS}" >> "${TOR_CONFIG_FILE}"
+    fi
+
     ## set exit relay value
     echo "ExitRelay $EXIT_RELAY" >> "${TOR_CONFIG_FILE}"
     echo "%include $BRIDGE_FILE" >> "${TOR_CONFIG_FILE}"
@@ -137,6 +146,10 @@ print_config () {
         info "  SocksPolicy reject set: ${SOCKS_REJECT}"
     fi    
 
+    if [[ ! -z "${TOR_CONTROL_PORT}" ]]; then
+        info "  ControlPort set: ${TOR_CONTROL_PORT}"
+        info "  PASSWORD: $PASSWORD"
+    fi
     if [[ ! -z "${HTTPS_PROXY}" ]]; then
         info "  HTTPSProxy set: ${HTTPS_PROXY}"
     fi
