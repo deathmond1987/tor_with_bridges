@@ -45,11 +45,12 @@ EXIT_RELAY=${EXIT_RELAY:=0}
 HTTPS_PROXY=${HTTPS_PROXY:=}
 HTTPS_PROXY_CREDS=${HTTPS_PROXY_CREDS:=}
 TOR_CONTROL_PORT=${TOR_CONTROL_PORT:=}
+HTTP_TUNNEL_PORT=${HTTP_TUNNEL_PORT:=}
+EXCLUDE_EXIT_NODES=${EXCLUDE_EXIT_NODES:=}
 ## set tor relay scanner values
 NUM_RELAYS=${NUM_RELAYS:=100}
 MIN_RELAYS=${MIN_RELAYS:=1}
 RELAY_TIMEOUT=${RELAY_TIMEOUT:=3}
-EXCLUDE_EXIT_NODES=${EXCLUDE_EXIT_NODES:="{ru}"}
 
 ## remove tor config file if exist
 if [[ -f "${TOR_CONFIG_FILE}" ]]; then  
@@ -107,29 +108,50 @@ tor_config () {
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
         echo "SocksPolicy accept ${SOCKS_ACCEPT}" >> "${TOR_CONFIG_FILE}"
     fi
+
+    ## same but reject
     if [[ ! -z "${SOCKS_REJECT}" ]]; then
         echo "SocksPolicy reject ${SOCKS_REJECT}" >> "${TOR_CONFIG_FILE}"
     fi
- 
+
+    ## set tor control port
     if [[ ! -z "${TOR_CONTROL_PORT}" ]]; then
         echo "ControlPort 0.0.0.0:${TOR_CONTROL_PORT}" >> "${TOR_CONFIG_FILE}"
+        ## gen random password
         PASS_GEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32; echo)
+        ## use PASSWORD variable. if empty - use previous gen password 
         PASSWORD=${PASSWORD:=$PASS_GEN}
+        ## get password hash
         HASH_PASS=$(tor --hash-password $PASSWORD | tail -n1)
+        ## set hash password to config
         echo "HashedControlPassword ${HASH_PASS}" >> "${TOR_CONFIG_FILE}"
     fi
 
     ## set exit relay value
     echo "ExitRelay $EXIT_RELAY" >> "${TOR_CONFIG_FILE}"
+
+    ## add include for file with bridge list
     echo "%include $BRIDGE_FILE" >> "${TOR_CONFIG_FILE}"
 
+    ## set tor use external proxe
     if [[ ! -z "${HTTPS_PROXY}" ]]; then
         echo  "HTTPSProxy ${HTTPS_PROXY}" >> "${TOR_CONFIG_FILE}"
     fi
+
+    ## set external proxy credentials
     if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
         echo "HTTPSProxyAuthenticator ${HTTPS_PROXY_CREDS}" >> "${TOR_CONFIG_FILE}"
     fi
-    echo "ExcludeExitNodes $EXCLUDE_EXIT_NODES" >> "${TOR_CONFIG_FILE}"
+
+    ## set array of excluded exit nodes
+    if [[ ! -z "${EXCLUDE_EXIT_NODES}" ]]; then
+        echo "ExcludeExitNodes ${EXCLUDE_EXIT_NODES}" >> "${TOR_CONFIG_FILE}"
+    fi 
+
+    ## today tor can be simple proxy
+    if [[ ! -z "${HTTP_TUNNEL_PORT}" ]]; then
+        echo "HTTPTunnelPort 0.0.0.0:${HTTP_TUNNEL_PORT}" >> "${TOR_CONFIG_FILE}"
+    fi
 }
 
 print_config () {
@@ -156,13 +178,19 @@ print_config () {
     if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
         info "  HTTPSProxyAuthenticator set: $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
     fi
-    info "  ExcludeExitNodes set: $EXCLUDE_EXIT_NODES"
+    if [[ ! -z "${EXCLUDE_EXIT_NODES}" ]]; then
+        info "  ExcludeExitNodes set: ${EXCLUDE_EXIT_NODES}"
+    fi
+    if [[ ! -z "${HTTP_TUNNEL_PORT}" ]]; then
+        info "  HTTPTunnelPort set: 0.0.0.0:${HTTP_TUNNEL_PORT}"
+    fi
     warn "scanner config:"
     info "  min relays to find set: ${MIN_RELAYS}"
     info "  timeout relay check set: ${RELAY_TIMEOUT}"
     info "  check simultaneously bridges availability set: ${NUM_RELAYS}"
     warn "------------------------------------------------------------------------------"
     info "config examples: https://wiki.archlinux.org/title/tor"
+    info "tor manual: https://2019.www.torproject.org/docs/tor-manual.html.en"
 }
 
 relay_scan () {
