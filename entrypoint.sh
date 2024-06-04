@@ -116,7 +116,7 @@ tor_config () {
 print_config () {
     ## print info about config sets
     info "CONFIG:"
-    warn "--------------------------------------------------------------------"
+    warn "------------------------------------------------------------------------------"
     warn "tor config:"
     info "  SocksPort listen on ${SOCKS_IP}:${SOCKS_PORT}"
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
@@ -137,10 +137,7 @@ print_config () {
     info "  min relays to find set to ${MIN_RELAYS}"
     info "  timeout relay check set to ${RELAY_TIMEOUT}"
     info "  check simultaneously bridges availability set to ${NUM_RELAYS}"
-    if [[ ! -z "${PROXY_FOR_SCANNER}" ]]; then
-        info "  scanner proxy set to ${PROXY_FOR_SCANNER}"
-    fi
-    warn "--------------------------------------------------------------------"
+    warn "------------------------------------------------------------------------------"
 }
 
 relay_scan () {
