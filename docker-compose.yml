@@ -11,10 +11,11 @@ services:
       - "NUM_RELAYS=100"
       - "MIN_RELAYS=3"
       - "RELAY_TIMEOUT=3"
-## set proxy for download list of bridges. Format: http://user:pass@host:port; socks5h://user:pass@host:port'
-      - "PROXY_FOR_SCANNER="
       - "HTTPS_PROXY="
       - "HTTPS_PROXY_CREDS="
       - "SOCKS_ACCEPT="
       - "SOCKS_REJECT="
       - "PROXY_FOR_SCANNER"
+      - "TZ=Europe/Moscow"
+      - "EXCLUDE_EXIT_NODES={ru}, {en}"
+#      - "DEBUG=true"

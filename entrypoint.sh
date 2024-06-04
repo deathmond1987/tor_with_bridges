@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 #set -x
 set -euo pipefail
+
+## debug first
+DEBUG=${DEBUG:=}
+if [ ! -z ${DEBUG} ]; then
+    set -xv
+fi
+
 ## colors
 reset="\033[0m"
 red="\033[0;31m"
@@ -41,6 +48,7 @@ HTTPS_PROXY_CREDS=${HTTPS_PROXY_CREDS:=}
 NUM_RELAYS=${NUM_RELAYS:=100}
 MIN_RELAYS=${MIN_RELAYS:=1}
 RELAY_TIMEOUT=${RELAY_TIMEOUT:=3}
+EXCLUDE_EXIT_NODES=${EXCLUDE_EXIT_NODES:="{ru}"}
 
 ## remove tor config file if exist
 if [[ -f "${TOR_CONFIG_FILE}" ]]; then  
@@ -112,6 +120,7 @@ tor_config () {
     if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
         echo "HTTPSProxyAuthenticator ${HTTPS_PROXY_CREDS}" >> "${TOR_CONFIG_FILE}"
     fi
+    echo "ExcludeExitNodes $EXCLUDE_EXIT_NODES" >> "${TOR_CONFIG_FILE}"
 }
 
 print_config () {
@@ -121,23 +130,24 @@ print_config () {
     warn "tor config:"
     info "  SocksPort listen on ${SOCKS_IP}:${SOCKS_PORT}"
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
-        info "  SocksPolicy accept set to ${SOCKS_ACCEPT}"
+        info "  SocksPolicy accept set: ${SOCKS_ACCEPT}"
     fi
-    info "  set exit relay to $EXIT_RELAY"
+    info "  exit relay: $EXIT_RELAY"
     if [[ ! -z "${SOCKS_REJECT}" ]]; then
-        info "  SocksPolicy reject set to ${SOCKS_REJECT}"
+        info "  SocksPolicy reject set: ${SOCKS_REJECT}"
     fi    
 
     if [[ ! -z "${HTTPS_PROXY}" ]]; then
-        info "  HTTPSProxy set to ${HTTPS_PROXY}"
+        info "  HTTPSProxy set: ${HTTPS_PROXY}"
     fi
     if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
-        info "  HTTPSProxyAuthenticator set to $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
+        info "  HTTPSProxyAuthenticator set: $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
     fi
+    info "  ExcludeExitNodes set: $EXCLUDE_EXIT_NODES"
     warn "scanner config:"
-    info "  min relays to find set to ${MIN_RELAYS}"
-    info "  timeout relay check set to ${RELAY_TIMEOUT}"
-    info "  check simultaneously bridges availability set to ${NUM_RELAYS}"
+    info "  min relays to find set: ${MIN_RELAYS}"
+    info "  timeout relay check set: ${RELAY_TIMEOUT}"
+    info "  check simultaneously bridges availability set: ${NUM_RELAYS}"
     warn "------------------------------------------------------------------------------"
 }
 
@@ -159,6 +169,12 @@ relay_scan () {
     success "number of relays scanner found: $(( $(wc -l < ${BRIDGE_FILE}) - 1 ))"
 }
 
+print_debug () {
+    if [ ! -z "${DEBUG}" ]; then
+        cat "${TOR_CONFIG_FILE}"
+        cat "${BRIDGE_FILE}"
+    fi
+}
 main () {
     tor_config
     print_config
@@ -166,6 +182,7 @@ main () {
     relay_scan
      ## Display Tor version & torrc in log
     tor --version
+    print_debug
     ## Execute dockerfile CMD as nonroot alternate gosu                                                                                                                           "
     su-exec "${PUID}:${PGID}" "$@"
 }
