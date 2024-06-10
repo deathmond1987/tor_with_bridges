@@ -4,6 +4,7 @@ services:
     container_name: tor
     hostname: tor
     restart: always
+    pull_policy: always
     ports:
       - "9050:${SOCKS_PORT}"
       - "9051:${TOR_CONTROL_PORT}"
