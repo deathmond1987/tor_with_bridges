@@ -233,6 +233,7 @@ main () {
     relay_scan
      ## Display Tor version & torrc in log
     tor --version
+    print_config
     print_debug
     ## Execute dockerfile CMD as nonroot alternate gosu                                                                                                                           "
     su-exec "${PUID}:${PGID}" "$@"
