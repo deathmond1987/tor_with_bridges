@@ -210,6 +210,7 @@ relay_scan () {
                           -g "${MIN_RELAYS}" \
                           --timeout "${RELAY_TIMEOUT}" > "${BRIDGE_FILE}"
     done
+    sed -in 's/$/ IPv4Only' "${BRIDGE_FILE}"
     ## remove lock file
     rm -f "${LOCK_FILE}"
     ## print min relays founded info
