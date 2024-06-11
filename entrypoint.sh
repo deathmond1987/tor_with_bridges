@@ -211,7 +211,7 @@ relay_scan () {
                           --timeout "${RELAY_TIMEOUT}" > "${BRIDGE_FILE}"
     done
     ## try remove annoying warn messages
-    sed -i '/^Bridge/ s/$/ IPv4Only/' "${BRIDGE_FILE}"
+    #sed -i '/^Bridge/ s/$/ IPv4Only/' "${BRIDGE_FILE}"
     ## remove lock file
     rm -f "${LOCK_FILE}"
     ## print min relays founded info
