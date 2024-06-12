@@ -80,7 +80,6 @@ RUN apk --no-cache add \
     tini su-exec \
     openssl \
     tzdata
-#shadow coreutils tzdata
 ## data directory
 ENV DATA_DIR=/tor
 
