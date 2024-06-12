@@ -96,7 +96,7 @@ COPY --chown=nonroot:nonroot --chmod=700 entrypoint.sh /usr/local/bin
 
 ## Docker health check
 HEALTHCHECK --interval=5m --retries=2 \
-            CMD if [ -f ${DATA_DIR}/.lock ]; then echo "tor starting...";  else curl --retry 4 --max-time 10 -xs --socks5-hostname 127.0.0.1:${SOCKS_PORT} 'https://check.torproject.org' | tac | grep -qm1 Congratulations || pkill tini && exit 1 ; fi
+            CMD if [ -f ${DATA_DIR}/.lock ]; then echo "tor starting...";  else curl --retry 4 --max-time 10 -xs --socks5-hostname 127.0.0.1:${SOCKS_PORT} 'https://check.torproject.org' | tac | grep -qm1 Congratulations || pkill tor; fi
 
 
 ## ENV VARIABLES
