@@ -79,7 +79,8 @@ RUN apk --no-cache add \
     libevent \
     tini su-exec \
     openssl \
-    tzdata
+    tzdata \
+    xz-dev
 ## data directory
 ENV DATA_DIR=/tor
 
