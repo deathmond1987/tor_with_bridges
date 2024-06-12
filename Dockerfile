@@ -94,6 +94,7 @@ COPY --from=tor-builder /usr/local/ /usr/local/
 COPY --chown=nonroot:nonroot --chmod=700 entrypoint.sh /usr/local/bin
 
 ## Docker health check
+## also restart logic. if curl cannot fetch info - we kill tor process to force restart container by restart: always directive in docker-compose.yml
 HEALTHCHECK --interval=5m --retries=2 \
             CMD if [ -f ${DATA_DIR}/.lock ]; then echo "tor starting...";  else curl --retry 4 --max-time 10 -xs --socks5-hostname 127.0.0.1:${SOCKS_PORT} 'https://check.torproject.org' | tac | grep -qm1 Congratulations || pkill tor; fi
 
