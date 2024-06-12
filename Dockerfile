@@ -111,7 +111,7 @@ LABEL version=$TOR_VER
 LABEL description="A docker image for tor with bridge finder"
 LABEL license="GNU"
 LABEL url="https://www.torproject.org"
-LABEL vcs-url="https://github.com/deathmond1987/docker-tor/"
+LABEL vcs-url="https://github.com/deathmond1987/tor_with_bridges/"
 
 WORKDIR ${DATA_DIR}
 ENTRYPOINT ["/sbin/tini", "--", "entrypoint.sh"]
