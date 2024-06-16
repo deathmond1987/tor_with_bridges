@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+## TO DO: CHECK DATE!!
+
 ## debug first
 DEBUG=${DEBUG:=}
 if [ ! -z ${DEBUG} ]; then
