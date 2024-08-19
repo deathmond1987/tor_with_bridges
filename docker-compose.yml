@@ -5,8 +5,23 @@ services:
     hostname: tor
     restart: always
     pull_policy: always
+    deploy:
+      labels:
+        autoheal: true
+
     ports:
       - "9050:${SOCKS_PORT}"
       - "9051:${TOR_CONTROL_PORT}"
     env_file:
       - .env
+  autoheal:
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+      AUTOHEAL_INTERVAL: 60
+      AUTOHEAL_START_PERIOD: 600
+    image: willfarrell/autoheal:latest
+    network_mode: none
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
