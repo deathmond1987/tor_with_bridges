@@ -210,7 +210,7 @@ relay_scan () {
         tor-relay-scanner --torrc \
                           -n "${NUM_RELAYS}" \
                           -g "${MIN_RELAYS}" \
-                          --timeout "${RELAY_TIMEOUT}" > "${BRIDGE_FILE}"
+                          --timeout "${RELAY_TIMEOUT}" > "${BRIDGE_FILE}" | grep -v "or_addresses"
     done
     ## try remove annoying warn messages
     #sed -i '/^Bridge/ s/$/ IPv4Only/' "${BRIDGE_FILE}"
@@ -238,7 +238,7 @@ main () {
     tor --version
     print_config
     print_debug
-    ## Execute dockerfile CMD as nonroot alternate gosu                                                                                                                           "
+    ## Execute dockerfile CMD as nonroot alternate gosu
     su-exec "${PUID}:${PGID}" "$@"
 }
 
