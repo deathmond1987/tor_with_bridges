@@ -158,6 +158,19 @@ tor_config () {
     fi
 }
 
+print_scanner_config () {
+    warn "scanner config:"
+    info "  min relays to find set: ${MIN_RELAYS}"
+    info "  timeout relay check set: ${RELAY_TIMEOUT}"
+    info "  check simultaneously bridges availability set: ${NUM_RELAYS}"
+    warn "------------------------------------------------------------------------------"
+    echo ""
+    info "config examples: https://wiki.archlinux.org/title/tor
+    "
+    info "tor manual: https://2019.www.torproject.org/docs/tor-manual.html.en
+    "
+}
+
 print_config () {
     ## print info about config sets
     info "CONFIG:"
@@ -188,16 +201,6 @@ print_config () {
     if [[ ! -z "${HTTP_TUNNEL_PORT}" ]]; then
         info "  HTTPTunnelPort set: 0.0.0.0:${HTTP_TUNNEL_PORT}"
     fi
-    warn "scanner config:"
-    info "  min relays to find set: ${MIN_RELAYS}"
-    info "  timeout relay check set: ${RELAY_TIMEOUT}"
-    info "  check simultaneously bridges availability set: ${NUM_RELAYS}"
-    warn "------------------------------------------------------------------------------"
-    echo ""
-    info "config examples: https://wiki.archlinux.org/title/tor
-    "
-    info "tor manual: https://2019.www.torproject.org/docs/tor-manual.html.en
-    "
 }
 
 relay_scan () {
@@ -231,7 +234,7 @@ print_debug () {
 }
 main () {
     tor_config
-    print_config
+    print_scanner_config
     map_user
     relay_scan
      ## Display Tor version & torrc in log
