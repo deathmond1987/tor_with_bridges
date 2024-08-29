@@ -239,7 +239,8 @@ main () {
     print_scanner_config
     map_user
     relay_scan
-     ## Display Tor version & torrc in log
+    print_config
+    ## Display Tor version & torrc in log
     tor --version
     print_debug
     ## Execute dockerfile CMD as nonroot alternate gosu
