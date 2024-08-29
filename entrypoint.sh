@@ -174,33 +174,32 @@ print_scanner_config () {
 
 print_config () {
     ## print info about config sets
-    info "CONFIG:"
-    warn "------------------------------------------------------------------------------"
     warn "tor config:"
+    warn "------------------------------------------------------------------------------"
     info "  SocksPort listen on ${SOCKS_IP}:${SOCKS_PORT}"
     if [[ ! -z "${SOCKS_ACCEPT}" ]]; then
-        info "  SocksPolicy accept set: ${SOCKS_ACCEPT}"
+        info "    SocksPolicy accept set: ${SOCKS_ACCEPT}"
     fi
     info "  exit relay: $EXIT_RELAY"
     if [[ ! -z "${SOCKS_REJECT}" ]]; then
-        info "  SocksPolicy reject set: ${SOCKS_REJECT}"
+        info "    SocksPolicy reject set: ${SOCKS_REJECT}"
     fi    
 
     if [[ ! -z "${TOR_CONTROL_PORT}" ]]; then
-        info "  ControlPort set: ${TOR_CONTROL_PORT}"
-        info "  PASSWORD: $PASSWORD"
+        info "    ControlPort set: ${TOR_CONTROL_PORT}"
+        info "    PASSWORD: $PASSWORD"
     fi
     if [[ ! -z "${HTTPS_PROXY}" ]]; then
         info "  HTTPSProxy set: ${HTTPS_PROXY}"
     fi
     if [[ ! -z "${HTTPS_PROXY_CREDS}" ]]; then
-        info "  HTTPSProxyAuthenticator set: $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
+        info "    HTTPSProxyAuthenticator set: $(echo ${HTTPS_PROXY_CREDS} | sed 's/:.*$/:*****/')"
     fi
     if [[ ! -z "${EXCLUDE_EXIT_NODES}" ]]; then
-        info "  ExcludeExitNodes set: ${EXCLUDE_EXIT_NODES}"
+        info "    ExcludeExitNodes set: ${EXCLUDE_EXIT_NODES}"
     fi
     if [[ ! -z "${HTTP_TUNNEL_PORT}" ]]; then
-        info "  HTTPTunnelPort set: 0.0.0.0:${HTTP_TUNNEL_PORT}"
+        info "    HTTPTunnelPort set: 0.0.0.0:${HTTP_TUNNEL_PORT}"
     fi
     warn "------------------------------------------------------------------------------"
 }
