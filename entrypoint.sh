@@ -159,6 +159,7 @@ tor_config () {
 }
 
 print_scanner_config () {
+    warn "------------------------------------------------------------------------------"
     warn "scanner config:"
     info "  min relays to find set: ${MIN_RELAYS}"
     info "  timeout relay check set: ${RELAY_TIMEOUT}"
@@ -201,6 +202,7 @@ print_config () {
     if [[ ! -z "${HTTP_TUNNEL_PORT}" ]]; then
         info "  HTTPTunnelPort set: 0.0.0.0:${HTTP_TUNNEL_PORT}"
     fi
+    warn "------------------------------------------------------------------------------"
 }
 
 relay_scan () {
