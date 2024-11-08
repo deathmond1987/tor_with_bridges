@@ -4,7 +4,8 @@ services:
     container_name: tor
     hostname: tor
     restart: always
-    pull_policy: always
+ ## always means always. when local image exist too 
+ #   pull_policy: always
     deploy:
       labels:
         autoheal: true
