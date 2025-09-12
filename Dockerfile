@@ -35,7 +35,7 @@ RUN apk add python3 \
 ## build elf from app dir
     pyinstaller -F --paths "$APP_DIR" "$APP_DIR"/__main__.py
 RUN apk add build-base cmake curl-dev nlohmann-json-dev
-ADD https://github.com/deathmond1987/tor-relay-scanner.git
+ADD https://github.com/deathmond1987/tor-relay-scanner.git /
 WORKDIR tor-relay-scanner/cpp
 RUN make release
 
