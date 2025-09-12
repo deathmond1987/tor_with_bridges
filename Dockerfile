@@ -95,7 +95,7 @@ ENV DATA_DIR=/tor
 RUN mkdir -p ${DATA_DIR} && chown -R nonroot:nonroot ${DATA_DIR} && chmod -R go+rX,u+rwX ${DATA_DIR}
 ## Copy compiled tor relay scanner from bridge-builder
 #COPY --from=bridge-builder --chmod=777 /tor-relay-scanner/dist/__main__ /usr/local/sbin/tor-relay-scanner
-COPY --from=bridge-builder --chmod=777 /cpp/build/tor-relay-scanner /usr/local/sbin/tor-relay-scanner
+COPY --from=bridge-builder --chmod=777 /cpp/build/tor-relay-scanner /usr/local/bin/tor-relay-scanner
 ## Copy compiled Tor daemon from tor-builder
 COPY --from=tor-builder /usr/local/ /usr/local/
 
