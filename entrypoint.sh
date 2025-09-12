@@ -214,7 +214,7 @@ relay_scan () {
         tor-relay-scanner --torrc \
                           -n "${NUM_RELAYS}" \
                           -g "${MIN_RELAYS}" \
-                          --timeout "${RELAY_TIMEOUT}" 2> >(grep -v "or_addresses") > "${BRIDGE_FILE}"
+                          --timeout "${RELAY_TIMEOUT}"  > "${BRIDGE_FILE}"
     done
     ## try remove annoying warn messages
     #sed -i '/^Bridge/ s/$/ IPv4Only/' "${BRIDGE_FILE}"

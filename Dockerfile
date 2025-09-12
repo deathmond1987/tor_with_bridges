@@ -9,36 +9,37 @@ ARG ALPINE_VER=latest
 
 FROM alpine:$ALPINE_VER AS bridge-builder
 
-## Set app dir
-ARG APP_DIR=torparse
-## Get build packages
-RUN apk add python3 \
-    py3-pip \
-## pep-668
-    pipx \
-    git \
-    binutils &&\
-## Get pyinstaller
-    pipx install pyinstaller &&\
-## Add pipx to PATH
-    export PATH=/root/.local/bin:$PATH &&\
-## Get source
-    git clone --branch main https://github.com/ValdikSS/tor-relay-scanner.git &&\
-## Move to source dir
-    cd tor-relay-scanner &&\
-## Install package to $APP_DIR
-    pip install . --target "$APP_DIR" &&\
-## Remove cache from dir
-    find "$APP_DIR" -path '*/__pycache__*' -delete &&\
-## copy main to app dir
-    cp "$APP_DIR"/tor_relay_scanner/__main__.py "$APP_DIR"/ &&\
-## build elf from app dir
-    pyinstaller -F --paths "$APP_DIR" "$APP_DIR"/__main__.py
-RUN apk add build-base cmake curl-dev nlohmann-json-dev
+RUN apk add build-base cmake curl-dev nlohmann-json binutils
 ADD https://github.com/deathmond1987/tor-relay-scanner.git /
-WORKDIR tor-relay-scanner/cpp
-RUN make release
+WORKDIR /cpp
+RUN make build
+RUN strip /cpp/build/tor-relay-scanner
 
+### Set app dir
+#ARG APP_DIR=torparse
+### Get build packages
+#RUN apk add python3 \
+#    py3-pip \
+### pep-668
+#    pipx \
+#    git \
+#    binutils &&\
+### Get pyinstaller
+#    pipx install pyinstaller &&\
+### Add pipx to PATH
+#    export PATH=/root/.local/bin:$PATH &&\
+### Get source
+#    git clone --branch main https://github.com/ValdikSS/tor-relay-scanner.git &&\
+### Move to source dir
+#    cd tor-relay-scanner &&\
+### Install package to $APP_DIR
+#    pip install . --target "$APP_DIR" &&\
+### Remove cache from dir
+#    find "$APP_DIR" -path '*/__pycache__*' -delete &&\
+### copy main to app dir
+#    cp "$APP_DIR"/tor_relay_scanner/__main__.py "$APP_DIR"/ &&\
+### build elf from app dir
+#    pyinstaller -F --paths "$APP_DIR" "$APP_DIR"/__main__.py
 
 ########################################################################################
 ## STAGE ONE - BUILD TOR
@@ -93,7 +94,8 @@ ENV DATA_DIR=/tor
 ## Create tor directories
 RUN mkdir -p ${DATA_DIR} && chown -R nonroot:nonroot ${DATA_DIR} && chmod -R go+rX,u+rwX ${DATA_DIR}
 ## Copy compiled tor relay scanner from bridge-builder
-COPY --from=bridge-builder --chmod=777 /tor-relay-scanner/dist/__main__ /usr/local/sbin/tor-relay-scanner
+#COPY --from=bridge-builder --chmod=777 /tor-relay-scanner/dist/__main__ /usr/local/sbin/tor-relay-scanner
+COPY --from=bridge-builder --chmod=777 /cpp/build/tor-relay-scanner /usr/local/sbin/tor-relay-scanner
 ## Copy compiled Tor daemon from tor-builder
 COPY --from=tor-builder /usr/local/ /usr/local/
 
