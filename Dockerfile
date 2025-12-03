@@ -48,7 +48,7 @@ FROM alpine:$ALPINE_VER AS tor-builder
 
 ## TOR_VER can be overwritten with --build-arg at build time
 ## Get latest version from > https://dist.torproject.org/
-ARG TOR_VER=0.4.8.17
+ARG TOR_VER=0.4.8.21
 ARG TORGZ=https://dist.torproject.org/tor-$TOR_VER.tar.gz
 #ARG TOR_KEY=0x6AFEE6D49E92B601
 
